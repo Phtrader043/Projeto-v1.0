@@ -1,21 +1,58 @@
-import pandas as pd
-import os
-import streamlit as st  # ✅ Faltava isso
+import streamlit as st
+import json
+from datetime import datetime, timedelta
 
-def carregar_historico():
-    if not os.path.exists("historicos/sinais.csv"):
-        return pd.DataFrame(columns=["Ativo", "Tipo", "Entrada", "Saída", "Tendência"])
-    return pd.read_csv("historicos/sinais.csv")
+
+def horario_brasilia():
+    agora = datetime.utcnow() - timedelta(hours=3)
+    return int(agora.strftime('%M'))
+
 
 def salvar_sinal(sinal):
-    df = carregar_historico()
-    df = pd.concat([df, pd.DataFrame([sinal])], ignore_index=True)
-    df.to_csv("historicos/sinais.csv", index=False)
+    try:
+        with open('historico.json', 'r') as f:
+            historico = json.load(f)
+    except:
+        historico = []
+
+    historico.append(sinal)
+    with open('historico.json', 'w') as f:
+        json.dump(historico, f)
+
 
 def exibir_historico():
-    df = carregar_historico()
-    if df.empty:
+    try:
+        with open('historico.json', 'r') as f:
+            historico = json.load(f)
+        st.subheader("📜 Histórico de Sinais")
+        for item in historico[-10:][::-1]:
+            st.info(f"""
+            **Ativo:** {item['Ativo']}  
+            **Tipo:** {item['Tipo']}  
+            **Entrada:** {item['Entrada']}  
+            **Saída:** {item['Saída']}  
+            **Tendência:** {item['Tendência']}
+            """)
+    except:
         st.info("Nenhum sinal gerado ainda.")
-    else:
-        st.table(df.tail(10))
+
+
+def carregar_background(imagem):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{carregar_imagem_base64(imagem)}");
+            background-size: cover;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+def carregar_imagem_base64(imagem):
+    import base64
+    with open(imagem, "rb") as img:
+        return base64.b64encode(img.read()).decode()
         
