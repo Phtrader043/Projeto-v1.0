@@ -1,43 +1,35 @@
 import streamlit as st
 from signal_engine import gerar_sinal
-from utils import carregar_historico, salvar_sinal, exibir_historico
-from datetime import datetime
-import pytz
+from utils import exibir_historico, carregar_background
+import time
 
-# Configurações da página
-st.set_page_config(page_title="Indicador GPT 1.0", layout="wide")
+# Carregar background
+carregar_background("assets/background.png")
 
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url('https://i.imgur.com/loX5xBF.jpg');
-        background-size: cover;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+st.title("💹 Indicador GPT 1.0 - Forex e Cripto")
 
-st.title("📈 Indicador GPT 1.0 - Cripto & Forex")
+modo = st.radio("Selecione o modo de operação:", ("Conservador", "Agressivo"))
+ativar = st.toggle("🚀 Ativar IA")
 
-st.sidebar.title("Configurações")
-modo = st.sidebar.selectbox("Selecione o Modo:", ["Conservador", "Agressivo"])
+st.subheader("📊 Sinais Gerados")
 
-# Botão para ativar IA
-ativar_ia = st.sidebar.toggle("🚀 Ativar IA", value=False)
-
-# Exibir histórico
-st.subheader("📜 Histórico de Sinais")
-exibir_historico()
-
-# Loop para geração automática de sinais
-if ativar_ia:
-    st.success("✅ IA Ativada e Buscando Sinais...")
-    sinal = gerar_sinal(modo)
-    salvar_sinal(sinal)
-    st.subheader("🔔 Novo Sinal Gerado")
-    st.json(sinal)
+if ativar:
+    while True:
+        with st.spinner('Buscando sinal...'):
+            sinal = gerar_sinal(modo)
+            if sinal:
+                st.success(f"""
+                **Ativo:** {sinal['Ativo']}
+                **Tipo:** {sinal['Tipo']}
+                **Entrada:** {sinal['Entrada']}
+                **Saída:** {sinal['Saída']}
+                **Tendência:** {sinal['Tendência']}
+                """)
+            else:
+                st.warning("Nenhum sinal confiável encontrado no momento.")
+            exibir_historico()
+            time.sleep(300)  # Espera 5 minutos
 else:
-    st.warning("🚫 IA Desativada")
-    
+    st.info("IA Desativada. Clique em 'Ativar IA' para iniciar.")
+    exibir_historico()
+            
