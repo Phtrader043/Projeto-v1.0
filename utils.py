@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import streamlit as st  # ✅ Faltava isso
 
 def carregar_historico():
     if not os.path.exists("historicos/sinais.csv"):
