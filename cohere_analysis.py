@@ -1,6 +1,6 @@
 import cohere
 
-API_KEY_COHERE = "0zIapnzQSu4BXmPPkFbL4A0E4HZG9wM6IotodQOn"
+API_KEY_COHERE = "5dzTGoR9jOnUcKrfOujxklCCwEtZuEVc4cBpJmQb"
 co = cohere.Client(API_KEY_COHERE)
 
 def analisar_tendencia(dados, modo):
